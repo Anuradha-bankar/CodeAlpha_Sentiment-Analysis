@@ -20,7 +20,7 @@ df = pd.read_csv(
     on_bad_lines="skip"
 )
 
-print("✅ Data Loaded:", df.shape)
+print("Data Loaded:", df.shape)
 
 # Clean data
 df.drop_duplicates(inplace=True)
@@ -46,13 +46,9 @@ df['Cleaned_Text'] = df['Review Text'].apply(preprocess_text)
 # Remove empty rows
 df = df[df['Cleaned_Text'] != ""]
 
-# -------------------------------
-# 🔥 SENTIMENT ANALYSIS (IMPROVED)
-# -------------------------------
-
 sia = SentimentIntensityAnalyzer()
 
-# VADER sentiment (BEST)
+# VADER sentiment
 def vader_sentiment(text):
     score = sia.polarity_scores(str(text))['compound']
     
@@ -75,7 +71,7 @@ def textblob_sentiment(text):
         return "Neutral"
 
 # Apply BOTH
-df['Sentiment_VADER'] = df['Review Text'].apply(vader_sentiment)   # 🔥 original text pe
+df['Sentiment_VADER'] = df['Review Text'].apply(vader_sentiment)  
 df['Sentiment_TextBlob'] = df['Cleaned_Text'].apply(textblob_sentiment)
 
 # Score column
@@ -84,18 +80,14 @@ df['Sentiment_Score'] = df['Review Text'].apply(lambda x: sia.polarity_scores(st
 # Final sentiment (use VADER as main)
 df['Final_Sentiment'] = df['Sentiment_VADER']
 
-# -------------------------------
-# 🔝 TOP WORDS
-# -------------------------------
+#TOP WORDS
+
 all_words = " ".join(df['Cleaned_Text']).split()
 print("Top 10 Words:", Counter(all_words).most_common(10))
 
-# -------------------------------
-# 💾 SAVE FILE
-# -------------------------------
 df.to_csv("nlp_output.csv", index=False)
 
-print("✅ NLP + ADVANCED SENTIMENT DONE!")
+print("NLP + ADVANCED SENTIMENT DONE!")
 
 # Preview
 print(df[['Review Text','Cleaned_Text','Sentiment_VADER','Sentiment_TextBlob','Final_Sentiment']].head())
