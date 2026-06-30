@@ -22,7 +22,7 @@ df = pd.read_csv(
 
 print("✅ Data Loaded:", df.shape)
 
-#fix empty strings
+# fix empty strings
 df = df.replace(["", " "], "N/A")
 
 df['Rating'] = (
@@ -35,21 +35,21 @@ df['Rating'] = pd.to_numeric(df['Rating'], errors='coerce')
 
 df['Rating'] = df['Rating'].fillna(0)
 
-#date experience
+# date experience
 df['Date of Experience'] = df['Date of Experience'].replace(["", " "], "N/A")
 df['Date of Experience'] = df['Date of Experience'].fillna("N/A")
 
-#link columns clean
+# link columns clean
 df['Profile Link'] = df['Profile Link'].apply(
     lambda x: x if isinstance(x, str) and "/users/" in x else "N/A"
 )
 
-#reviewers column clean
+# reviewers column clean
 df['Reviewer Name'] = df['Reviewer Name'].apply(
     lambda x: x if isinstance(x, str) and x.replace(" ", "").isalpha() else "N/A"
 )
 
-#all blank rows
+# all blank rows
 df = df.dropna(how="all")
 
 # Clean data
@@ -76,13 +76,11 @@ df['Cleaned_Text'] = df['Review Text'].apply(preprocess_text)
 # Remove empty rows
 df = df[df['Cleaned_Text'] != ""]
 
-# -------------------------------
-# 🔥 SENTIMENT ANALYSIS (IMPROVED)
-# -------------------------------
+# SENTIMENT ANALYSIS 
 
 sia = SentimentIntensityAnalyzer()
 
-# VADER sentiment (BEST)
+# VADER sentiment
 def vader_sentiment(text):
     score = sia.polarity_scores(str(text))['compound']
     
@@ -114,15 +112,11 @@ df['Sentiment_Score'] = df['Review Text'].apply(lambda x: sia.polarity_scores(st
 # Final sentiment (use VADER as main)
 df['Final_Sentiment'] = df['Sentiment_VADER']
 
-# -------------------------------
-# 🔝 TOP WORDS
-# -------------------------------
+# TOP WORDS
+
 all_words = " ".join(df['Cleaned_Text']).split()
 print("Top 10 Words:", Counter(all_words).most_common(10))
 
-# -------------------------------
-# 💾 SAVE FILE
-# -------------------------------
 df.to_csv("nlp_output.csv", index=False)
 
 print("✅ NLP + ADVANCED SENTIMENT DONE!")
